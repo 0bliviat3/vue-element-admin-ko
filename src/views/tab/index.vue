@@ -24,9 +24,10 @@ export default {
         { label: 'China', key: 'CN' },
         { label: 'USA', key: 'US' },
         { label: 'Japan', key: 'JP' },
-        { label: 'Eurozone', key: 'EU' }
+        { label: 'Eurozone', key: 'EU' },
+        { label: 'Korea', key: 'KO' }
       ],
-      activeName: 'CN',
+      activeName: 'KO',
       createdTimes: 0
     }
   },

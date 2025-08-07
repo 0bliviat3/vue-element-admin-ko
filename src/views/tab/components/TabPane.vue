@@ -70,7 +70,7 @@ export default {
   props: {
     type: {
       type: String,
-      default: 'CN'
+      default: 'KO'
     }
   },
   data() {

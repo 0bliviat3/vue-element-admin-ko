@@ -79,5 +79,25 @@ export default {
       two: '2',
       three: '3'
     }
+  },
+  ko: {
+    i18nView: {
+      title: '언어 변경',
+      note: 'vue-i18n을 사용합니다',
+      datePlaceholder: '날짜 선택',
+      selectPlaceholder: '선택하세요',
+      tableDate: '날짜',
+      tableName: '이름',
+      tableAddress: '주소',
+      default: 'default',
+      primary: 'primary',
+      success: 'success',
+      info: 'info',
+      warning: 'warning',
+      danger: 'danger',
+      one: '1',
+      two: '2',
+      three: '3'
+    }
   }
 }

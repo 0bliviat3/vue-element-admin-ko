@@ -5,10 +5,12 @@ import elementEnLocale from 'element-ui/lib/locale/lang/en' // element-ui lang
 import elementZhLocale from 'element-ui/lib/locale/lang/zh-CN'// element-ui lang
 import elementEsLocale from 'element-ui/lib/locale/lang/es'// element-ui lang
 import elementJaLocale from 'element-ui/lib/locale/lang/ja'// element-ui lang
+import elementKoLocale from 'element-ui/lib/locale/lang/ko'// element-ui lang
 import enLocale from './en'
 import zhLocale from './zh'
 import esLocale from './es'
 import jaLocale from './ja'
+import koLocale from './ko'
 
 Vue.use(VueI18n)
 
@@ -28,6 +30,10 @@ const messages = {
   ja: {
     ...jaLocale,
     ...elementJaLocale
+  },
+  ko: {
+    ...koLocale,
+    ...elementKoLocale
   }
 }
 export function getLanguage() {
@@ -42,7 +48,7 @@ export function getLanguage() {
       return locale
     }
   }
-  return 'en'
+  return 'ko'
 }
 const i18n = new VueI18n({
   // set locale
