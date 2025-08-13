@@ -9,12 +9,8 @@
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-select v-model="listQuery.dataStateCode" placeholder="데이터 상태" clearable class="filter-item" style="width: 140px;">
-        <el-option label="정상" value="NORMAL" />
-        <el-option label="삭제" value="DELETED" />
-      </el-select>
       <el-select v-model="listQuery.ableState" placeholder="사용 여부" clearable class="filter-item" style="width: 140px;">
-        <el-option label="활성" value="ENABLE" />
+        <el-option label="활성" value="ABLE" />
         <el-option label="비활성" value="DISABLE" />
       </el-select>
       <el-button type="primary" icon="el-icon-search" class="filter-item" @click="handleFilter">검색</el-button>
@@ -33,10 +29,9 @@
       <el-table-column prop="id" label="ID" width="80" align="center" />
       <el-table-column prop="name" label="프로그램명" min-width="150" />
       <el-table-column prop="frontPath" label="프론트 경로" min-width="150" />
-      <el-table-column prop="path" label="백엔드 경로" min-width="150" />
+      <el-table-column prop="path" label="백엔드 서비스" min-width="150" />
       <el-table-column prop="apiKey" label="API Key" min-width="150" />
       <el-table-column prop="description" label="설명" min-width="200" />
-      <el-table-column prop="dataStateCode" label="데이터 상태" width="120" />
       <el-table-column prop="ableState" label="사용 여부" width="100" />
       <el-table-column label="작업" width="180" align="center">
         <template slot-scope="{ row, $index }">
@@ -64,7 +59,7 @@
         <el-form-item label="프론트 경로" prop="frontPath">
           <el-input v-model="temp.frontPath" />
         </el-form-item>
-        <el-form-item label="백엔드 경로" prop="path">
+        <el-form-item label="백엔드 서비스" prop="path">
           <el-input v-model="temp.path" />
         </el-form-item>
         <el-form-item label="API Key" prop="apiKey">
@@ -73,15 +68,9 @@
         <el-form-item label="설명" prop="description">
           <el-input v-model="temp.description" type="textarea" />
         </el-form-item>
-        <el-form-item label="데이터 상태" prop="dataStateCode">
-          <el-select v-model="temp.dataStateCode" placeholder="선택">
-            <el-option label="정상" value="NORMAL" />
-            <el-option label="삭제" value="DELETED" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="사용 여부" prop="ableState">
           <el-select v-model="temp.ableState" placeholder="선택">
-            <el-option label="활성" value="ENABLE" />
+            <el-option label="활성" value="ABLE" />
             <el-option label="비활성" value="DISABLE" />
           </el-select>
         </el-form-item>
@@ -110,7 +99,6 @@ export default {
         page: 1,
         pageSize: 10,
         name: '',
-        dataStateCode: '',
         ableState: ''
       },
       temp: {
@@ -120,16 +108,13 @@ export default {
         path: '',
         apiKey: '',
         description: '',
-        dataStateCode: 'NORMAL',
-        ableState: 'ENABLE'
+        ableState: 'DISABLE'
       },
       dialogFormVisible: false,
       dialogStatus: '',
       rules: {
         name: [{ required: true, message: '프로그램명을 입력하세요', trigger: 'blur' }],
-        frontPath: [{ required: true, message: '프론트 경로를 입력하세요', trigger: 'blur' }],
-        path: [{ required: true, message: '백엔드 경로를 입력하세요', trigger: 'blur' }],
-        apiKey: [{ required: true, message: 'API Key를 입력하세요', trigger: 'blur' }]
+        frontPath: [{ required: true, message: '프론트 경로를 입력하세요', trigger: 'blur' }]
       }
     }
   },
@@ -141,10 +126,7 @@ export default {
       this.listLoading = true
       fetchProgramList({
         page: this.listQuery.page - 1, // 백엔드 page 0부터 시작
-        pageSize: this.listQuery.pageSize,
-        name: this.listQuery.name,
-        dataStateCode: this.listQuery.dataStateCode,
-        ableState: this.listQuery.ableState
+        pageSize: this.listQuery.pageSize
       }).then(res => {
         this.list = res.content
         this.total = res.totalElements
@@ -165,8 +147,7 @@ export default {
         path: '',
         apiKey: '',
         description: '',
-        dataStateCode: 'NORMAL',
-        ableState: 'ENABLE'
+        ableState: 'DISABLE'
       }
     },
     handleCreate() {
