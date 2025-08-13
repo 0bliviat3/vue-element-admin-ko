@@ -1,30 +1,35 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
-
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      autocomplete="on"
+      label-position="left"
+    >
       <div class="title-container">
-        <h3 class="title">
-          {{ $t('login.title') }}
-        </h3>
-        <lang-select class="set-language" />
+        <h3 class="title">로그인</h3>
       </div>
 
+      <!-- 아이디 입력 -->
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
           ref="username"
-          v-model="loginForm.username"
-          :placeholder="$t('login.username')"
-          name="username"
+          v-model="loginForm.userId"
+          placeholder="아이디"
+          name="userId"
           type="text"
           tabindex="1"
           autocomplete="on"
         />
       </el-form-item>
 
-      <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+      <!-- 비밀번호 입력 -->
+      <el-tooltip v-model="capsTooltip" content="Caps lock이 켜져 있습니다" placement="right" manual>
         <el-form-item prop="password">
           <span class="svg-container">
             <svg-icon icon-class="password" />
@@ -34,7 +39,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            :placeholder="$t('login.password')"
+            placeholder="비밀번호"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -48,168 +53,99 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
-        {{ $t('login.logIn') }}
+      <!-- 로그인 버튼 -->
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width:100%;margin-bottom:30px;"
+        @click.native.prevent="handleLogin"
+      >
+        로그인
       </el-button>
 
-      <div style="position:relative">
-        <div class="tips">
-          <span>{{ $t('login.username') }} : admin</span>
-          <span>{{ $t('login.password') }} : {{ $t('login.any') }}</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">
-            {{ $t('login.username') }} : editor
-          </span>
-          <span>{{ $t('login.password') }} : {{ $t('login.any') }}</span>
-        </div>
-
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          {{ $t('login.thirdparty') }}
+      <!-- 회원가입 버튼 -->
+      <div style="text-align:center;">
+        <span style="color:#fff; margin-right:10px;">아직 계정이 없으신가요?</span>
+        <el-button
+          class="signup-button"
+          type="success"
+          size="mini"
+          @click="$router.push('/register')"
+        >
+          회원가입
         </el-button>
       </div>
     </el-form>
-
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
-      {{ $t('login.thirdpartyTips') }}
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-import LangSelect from '@/components/LangSelect'
-import SocialSign from './components/SocialSignin'
 
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+      if (!value) {
+        callback(new Error('아이디를 입력해주세요'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+      if (!value || value.length < 6) {
+        callback(new Error('비밀번호는 6자 이상이어야 합니다'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        userId: '',
+        password: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        userId: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
       capsTooltip: false,
-      loading: false,
-      showDialog: false,
-      redirect: undefined,
-      otherQuery: {}
+      loading: false
     }
-  },
-  watch: {
-    $route: {
-      handler: function(route) {
-        const query = route.query
-        if (query) {
-          this.redirect = query.redirect
-          this.otherQuery = this.getOtherQuery(query)
-        }
-      },
-      immediate: true
-    }
-  },
-  created() {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
-  mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
-    } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
-    }
-  },
-  destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
     checkCapslock(e) {
       const { key } = e
-      this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
+      this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z'
     },
     showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
+      this.passwordType = this.passwordType === 'password' ? '' : 'password'
       this.$nextTick(() => {
         this.$refs.password.focus()
       })
     },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
-        } else {
-          console.log('error submit!!')
-          return false
+    async handleLogin() {
+      this.$refs.loginForm.validate(async(valid) => {
+        if (!valid) return
+        this.loading = true
+        try {
+          await this.$store.dispatch('user/login', {
+            userId: this.loginForm.userId,
+            password: this.loginForm.password
+          })
+          this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+        } catch (err) {
+          console.error(err)
+          this.$message.error('아이디 또는 비밀번호를 확인해주세요')
+        } finally {
+          this.loading = false
         }
       })
-    },
-    getOtherQuery(query) {
-      return Object.keys(query).reduce((acc, cur) => {
-        if (cur !== 'redirect') {
-          acc[cur] = query[cur]
-        }
-        return acc
-      }, {})
     }
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   }
 }
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
 $bg:#283443;

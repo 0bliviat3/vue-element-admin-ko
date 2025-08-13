@@ -62,7 +62,8 @@ export default {
     clipboardDemo: '클립보드',
     i18n: '다국어',
     externalLink: '외부 링크',
-    profile: '프로필'
+    profile: '프로필',
+    programManagement: '프로그램 관리'
   },
   navbar: {
     dashboard: '대시보드',

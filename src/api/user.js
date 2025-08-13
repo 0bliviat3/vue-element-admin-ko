@@ -1,24 +1,35 @@
 import request from '@/utils/request'
 
-export function login(data) {
+export function getInfo(id) {
   return request({
-    url: '/vue-element-admin/user/login',
+    url: '/user',
+    method: 'get',
+    params: { userId: id }
+  })
+}
+
+// 회원가입
+export function signUp(data) {
+  return request({
+    url: '/sign-up',
     method: 'post',
     data
   })
 }
 
-export function getInfo(token) {
+// 로그인
+export function signIn(data) {
   return request({
-    url: '/vue-element-admin/user/info',
-    method: 'get',
-    params: { token }
+    url: '/sign-in',
+    method: 'post',
+    data
   })
 }
 
-export function logout() {
+// 로그아웃
+export function signOut() {
   return request({
-    url: '/vue-element-admin/user/logout',
-    method: 'post'
+    url: '/sign-out',
+    method: 'get'
   })
 }

@@ -56,6 +56,11 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/register',
+    component: () => import('@/views/register/index'),
+    hidden: true
+  },
+  {
     path: '/auth-redirect',
     component: () => import('@/views/login/auth-redirect'),
     hidden: true
@@ -392,6 +397,18 @@ export const asyncRoutes = [
       {
         path: 'https://github.com/PanJiaChen/vue-element-admin',
         meta: { title: 'externalLink', icon: 'link' }
+      }
+    ]
+  },
+  {
+    path: '/programs',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/program/index'),
+        name: 'program management',
+        meta: { title: 'programManagement', icon: '' }
       }
     ]
   },
