@@ -412,6 +412,18 @@ export const asyncRoutes = [
       }
     ]
   },
+  {
+    path: '/menus',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/menu/index'),
+        name: 'menu management',
+        meta: { title: 'menuManagement', icon: '' }
+      }
+    ]
+  },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
