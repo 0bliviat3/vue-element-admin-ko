@@ -16,10 +16,7 @@
           <!-- 왼쪽: 아이콘 + 메뉴명 + 경로 -->
           <div class="flex items-center gap-2">
             <!-- 아이콘 (DB에 icon 필드 있으면 사용) -->
-            <i
-              :class="data.menuDTO.type === 'DIR' ? 'el-icon-folder' : 'el-icon-monitor'"
-              class="text-blue-500"
-            />
+            <i :class="data.menuDTO.type === 'DIR' ? 'el-icon-folder' : 'el-icon-monitor'" class="text-blue-500" />
             <span class="font-medium text-gray-800">{{ data.menuDTO.name }}</span>
           </div>
 
@@ -57,6 +54,7 @@
 <script>
 import MenuForm from './MenuForm'
 import { getMenuTree, createMenu, updateMenu, deleteMenu } from '@/api/menu'
+import store from '@/store'
 
 export default {
   name: 'MenuTreeManagement',
@@ -82,6 +80,13 @@ export default {
       try {
         const res = await getMenuTree()
         this.menus = [res] // 루트 노드
+        const { roles } = await store.dispatch('user/getInfo')
+        this.$store.dispatch('permission/generateRoutes', roles).then((routes) => {
+          this.$router.matcher = new this.$router.constructor({ mode: 'history' }).matcher
+          routes.forEach(r => {
+            this.$router.addRoute(r)
+          })
+        })
       } catch (err) {
         this.$message.error('메뉴 목록을 불러오는데 실패했습니다.')
       }
@@ -146,8 +151,8 @@ export default {
 
 <style scoped>
 .custom-tree-node {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
