@@ -57,8 +57,14 @@ import { extractElIcons } from '@/utils/iconHelper'
 export default {
   name: 'MenuForm',
   props: {
-    menuData: [],
-    selectedNode: []
+    menuData: {
+      type: Object,
+      default: () => ({})
+    },
+    selectedNode: {
+      type: Object,
+      default: () => ({})
+    }
   },
   data() {
     return {
@@ -91,18 +97,28 @@ export default {
       return this.allMenus.map(m => ({ id: m.id, name: m.name }))
     }
   },
+  watch: {
+    menuData: {
+      immediate: true, // 컴포넌트 생성 시에도 반영
+      deep: true, // 객체 내부 속성도 감시
+      handler(newVal) {
+        // prop이 바뀔 때마다 내부 상태 초기화
+        this.menuForm = { ...newVal }
+      }
+    },
+    selectedNode: {
+      immediate: true, // 컴포넌트 생성 시에도 반영
+      deep: true, // 객체 내부 속성도 감시
+      handler(newVal) {
+        // prop이 바뀔 때마다 내부 상태 초기화
+        this.menuForm.parentId = this.selectedNode.menuDTO.id
+      }
+    }
+  },
   mounted() {
     this.fetchPrograms()
     this.fetchMenus()
     this.iconOptions = extractElIcons()
-
-    if (this.menuData) {
-      this.menuForm = { ...this.menuData }
-    }
-    // 트리에서 선택한 노드가 있으면 자동 부모 매핑
-    if (!this.menuData && this.selectedNode) {
-      this.menuForm.parentId = this.selectedNode.menuDTO.id
-    }
   },
   methods: {
     async fetchPrograms() {

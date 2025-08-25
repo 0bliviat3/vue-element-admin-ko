@@ -35,25 +35,30 @@
       </draggable>
     </div>
 
-    <el-button type="primary" style="margin-top:20px" @click="saveLayout">
-      Save Layout
-    </el-button>
-
     <!-- 설정 슬라이드 패널 -->
     <el-drawer title="Settings" :visible.sync="drawerVisible" direction="rtl" size="400px" :modal="false">
-      <div v-if="selectedElement">
+      <el-form v-if="selectedElement" label-position="top" label-width="120px">
         <h4>{{ selectedElement.label }}</h4>
         <div v-if="selectedElement.type === 'input'">
+          <el-form-item label="discription">
+            <el-input v-model="selectedElement.settings.discription" />
+          </el-form-item>
           <el-form-item label="Input Width">
             <el-input v-model="selectedElement.settings.width" />
           </el-form-item>
         </div>
         <div v-else-if="selectedElement.type === 'select'">
+          <el-form-item label="discription">
+            <el-input v-model="selectedElement.settings.discription" />
+          </el-form-item>
           <el-form-item label="Options (comma separated)">
             <el-input v-model="selectedElement.settings.options" />
           </el-form-item>
         </div>
         <div v-else-if="selectedElement.type === 'editor'">
+          <el-form-item label="discription">
+            <el-input v-model="selectedElement.settings.discription" />
+          </el-form-item>
           <el-form-item label="Editor Type">
             <el-select v-model="selectedElement.settings.editor">
               <el-option label="Markdown" value="markdown" />
@@ -62,8 +67,13 @@
             </el-select>
           </el-form-item>
         </div>
-      </div>
-      <div slot="footer" class="dialog-footer">
+        <div v-else-if="selectedElement.type === 'file'">
+          <el-form-item label="discription">
+            <el-input v-model="selectedElement.settings.discription" />
+          </el-form-item>
+        </div>
+      </el-form>
+      <div class="drawer-footer" style="text-align: left; margin-top: 20px;">
         <el-button @click="drawerVisible = false">Cancel</el-button>
         <el-button type="primary" @click="drawerVisible = false">OK</el-button>
       </div>
@@ -78,17 +88,30 @@ import draggable from 'vuedraggable'
 export default {
   name: 'BoardBuilderDialog',
   components: { draggable },
+  props: {
+    initData: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       boardItems: [],
       paletteItems: [
         { id: 'input', label: 'Input Box', colSpan: 1, type: 'input', defaultSettings: { width: '100%' }, settings: {}},
         { id: 'select', label: 'Select Box', colSpan: 1, type: 'select', defaultSettings: { options: '' }, settings: {}},
-        { id: 'editor', label: 'Rich Editor', colSpan: 2, type: 'editor', defaultSettings: { editor: 'markdown' }, settings: {}},
+        { id: 'editor', label: 'Editor', colSpan: 2, type: 'editor', defaultSettings: { editor: 'markdown' }, settings: {}},
         { id: 'file', label: 'File Upload', colSpan: 2, type: 'file', defaultSettings: {}, settings: {}}
       ],
       drawerVisible: false,
       selectedElement: null
+    }
+  },
+  created() {
+    // 수정 모드일 경우 초기 데이터 세팅
+    if (this.initData && this.initData.length > 0) {
+      console.log('Initializing board with data:', this.initData)
+      this.boardItems = this.initData
     }
   },
   methods: {
@@ -102,9 +125,9 @@ export default {
     removeItem(index) {
       this.boardItems.splice(index, 1)
     },
-    saveLayout() {
-      console.log('Saved Layout JSON:', JSON.stringify(this.boardItems))
-      this.$message.success('Layout saved! Check console for JSON.')
+    // 👉 index.vue에서 사용할 데이터 추출 메서드
+    getData() {
+      return JSON.parse(JSON.stringify(this.boardItems))
     }
   }
 }
