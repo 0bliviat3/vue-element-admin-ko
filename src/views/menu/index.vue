@@ -55,6 +55,7 @@
 import MenuForm from './MenuForm'
 import { getMenuTree, createMenu, updateMenu, deleteMenu } from '@/api/menu'
 import store from '@/store'
+import { addDynamicRoutes } from '@/router/index'
 
 export default {
   name: 'MenuTreeManagement',
@@ -79,16 +80,18 @@ export default {
     async fetchMenus() {
       try {
         const res = await getMenuTree()
-        this.menus = [res] // 루트 노드
-        const { roles } = await store.dispatch('user/getInfo')
-        this.$store.dispatch('permission/generateRoutes', roles).then((routes) => {
-          this.$router.matcher = new this.$router.constructor({ mode: 'history' }).matcher
-          routes.forEach(r => {
-            this.$router.addRoute(r)
-          })
-        })
+        if (!res) throw new Error('Menu fetch failed.')
+
+        // 메뉴 트리와 flatRoutes를 Vuex에 저장
+        await store.dispatch('menu/fetchMenus', res)
+
+        // Vuex에서 메뉴 트리와 flatRoutes 가져오기
+        this.menus = store.getters['menu/menus']
+
+        addDynamicRoutes()
       } catch (err) {
         this.$message.error('메뉴 목록을 불러오는데 실패했습니다.')
+        console.error(err)
       }
     },
     openForm(node = null) {
@@ -125,25 +128,19 @@ export default {
         this.$message.error('삭제 실패')
       }
     },
-    handleNodeDrop(draggingNode, dropNode, type) {
+    async handleNodeDrop(draggingNode, dropNode, type) {
       const dragged = draggingNode.data.menuDTO
       const dropped = dropNode.data.menuDTO
 
-      let newParentId = null
-      if (type === 'inner') {
-        newParentId = dropped.id
-      } else {
-        newParentId = dropped.parentId
-      }
+      const newParentId = type === 'inner' ? dropped.id : dropped.parentId
 
-      updateMenu(dragged.id, { parentId: newParentId })
-        .then(() => {
-          this.$message.success('메뉴 위치가 변경되었습니다.')
-          this.fetchMenus()
-        })
-        .catch(() => {
-          this.$message.error('메뉴 이동 실패')
-        })
+      try {
+        await updateMenu(dragged.id, { parentId: newParentId })
+        this.$message.success('메뉴 위치가 변경되었습니다.')
+        this.fetchMenus() // Vuex와 라우터 동기화
+      } catch {
+        this.$message.error('메뉴 이동 실패')
+      }
     }
   }
 }

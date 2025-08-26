@@ -111,6 +111,7 @@ export default {
       deep: true, // 객체 내부 속성도 감시
       handler(newVal) {
         // prop이 바뀔 때마다 내부 상태 초기화
+        if (!newVal || this.menuForm.id) return
         this.menuForm.parentId = this.selectedNode.menuDTO.id
       }
     }

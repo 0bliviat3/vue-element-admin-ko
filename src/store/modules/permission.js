@@ -1,6 +1,4 @@
-import { asyncRoutes, constantRoutes } from '@/router'
-import { generateRoutesFromMenus } from '@/utils/menu'
-import { getMenuTree } from '@/api/menu'
+import { constantRoutes } from '@/router'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -66,29 +64,29 @@ const mutations = {
 
 // 하드코딩된 asyncRoutes를 사용하지 않고, 서버에서 가져온 메뉴 트리로 동적으로 라우트를 생성
 const actions = {
-  async generateRoutes({ commit }, roles) {
-    let accessedRoutes = []
+  // async generateRoutes({ commit }, roles) {
+  //   let accessedRoutes = []
 
-    // 1) 관리자(admin) 권한이면 서버 메뉴 기반으로 전부 생성
-    if (roles.includes('admin')) {
-      const menus = await getMenuTree()
-      accessedRoutes = generateRoutesFromMenus(menus)
-    } else {
-      // 2) 그 외 권한은 기존 asyncRoutes + 서버 메뉴 혼합
-      const menus = await getMenuTree()
-      const menuRoutes = generateRoutesFromMenus(menus)
+  //   // 1) 관리자(admin) 권한이면 서버 메뉴 기반으로 전부 생성
+  //   if (roles.includes('admin')) {
+  //     const menus = await getMenuTree()
+  //     accessedRoutes = generateRoutesFromMenus(menus)
+  //   } else {
+  //     // 2) 그 외 권한은 기존 asyncRoutes + 서버 메뉴 혼합
+  //     const menus = await getMenuTree()
+  //     const menuRoutes = generateRoutesFromMenus(menus)
 
-      // 기존 asyncRoutes 필터링
-      const roleRoutes = filterAsyncRoutes(asyncRoutes, roles)
+  //     // 기존 asyncRoutes 필터링
+  //     const roleRoutes = filterAsyncRoutes(asyncRoutes, roles)
 
-      // 합치기 (필요에 따라 concat 말고 merge 로직 작성 가능)
-      accessedRoutes = roleRoutes.concat(menuRoutes)
-    }
+  //     // 합치기 (필요에 따라 concat 말고 merge 로직 작성 가능)
+  //     accessedRoutes = roleRoutes.concat(menuRoutes)
+  //   }
 
-    console.log('accessedRoutes', accessedRoutes)
-    commit('SET_ROUTES', accessedRoutes)
-    return accessedRoutes
-  }
+  //   console.log('accessedRoutes', accessedRoutes)
+  //   commit('SET_ROUTES', accessedRoutes)
+  //   return accessedRoutes
+  // }
 }
 
 export default {

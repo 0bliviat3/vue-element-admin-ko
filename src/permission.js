@@ -5,6 +5,7 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
+import { addDynamicRoutes } from '@/router/index' // 컴포넌트 매핑
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -26,30 +27,22 @@ router.beforeEach(async(to, from, next) => {
       next({ path: '/' })
       NProgress.done() // hack: https://github.com/PanJiaChen/vue-element-admin/pull/2939
     } else {
-      // determine whether the user has obtained his permission roles through getInfo
-      const hasRoles = store.getters.roles && store.getters.roles.length > 0
-      if (hasRoles) {
+      // 메뉴/권한 정보가 이미 Vuex에 있으면 next
+      const menusLoaded =
+        store.getters['menu/menus'] && store.getters['menu/menus'].length > 0
+      if (menusLoaded) {
         next()
       } else {
         try {
-          // get user info
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo')
-
-          // generate accessible routes map based on roles
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-
-          // dynamically add accessible routes
-          router.addRoutes(accessRoutes)
-
-          // hack method to ensure that addRoutes is complete
-          // set the replace: true, so the navigation will not leave a history record
+          // 메뉴/라우트 fetch
+          await store.dispatch('menu/fetchMenus')
+          // 동적 라우트 등록
+          addDynamicRoutes()
           next({ ...to, replace: true })
-        } catch (error) {
-          console.log('error', error)
-          // remove token and go to login page to re-login
+        } catch (err) {
+          console.error(err)
           await store.dispatch('user/resetToken')
-          Message.error(error || 'Has Error')
+          Message.error('권한 또는 메뉴 정보 로드 실패')
           next(`/login?redirect=${to.path}`)
           NProgress.done()
         }
